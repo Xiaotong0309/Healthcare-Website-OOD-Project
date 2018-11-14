@@ -1,0 +1,4 @@
+0:0:0:0:0:0:0:1 - - [03/Nov/2018:16:39:26 -0600] "GET /SpringMVCTest HTTP/1.1" 302 - http-bio-8080-exec-1 0
+0:0:0:0:0:0:0:1 - - [03/Nov/2018:16:39:26 -0600] "GET /SpringMVCTest/ HTTP/1.1" 200 52 http-bio-8080-exec-3 38
+0:0:0:0:0:0:0:1 - - [03/Nov/2018:16:39:26 -0600] "GET /favicon.ico HTTP/1.1" 404 - http-bio-8080-exec-4 0
+0:0:0:0:0:0:0:1 - - [03/Nov/2018:16:39:38 -0600] "GET /SpringMVCTest/welcome HTTP/1.1" 200 146 http-bio-8080-exec-5 63
