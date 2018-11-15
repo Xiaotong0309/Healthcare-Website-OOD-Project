@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>appointment</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <el-table
+            :data="sessionList"
+            height="250"
+            fit
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="id"
+                label="session Id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="time"
+                label="time"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="doctorName"
+                label="doctor name"
+                width="180">
+        </el-table-column>
+
+      
+        <el-table-column
+                label="operator"
+                width="200">
+            <template slot-scope="scope">
+                <el-button width="100"
+                           size="mini"
+                           @click="handleEdit(scope.$index, scope.row)">schedule
+                </el-button>
+               
+            </template>
+        </el-table-column>
+    </el-table>
+
+    <el-dialog
+            title="detail"
+            :visible.sync="showAnswerList"
+            width="80%">
+     
+        <el-table
+                :data="answerList"
+                height="250"
+                style="width: 80%">
+            <el-table-column
+                    prop="id"
+                    label="id"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="studentId"
+                    label="Id"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="studentName"
+                    label="name"
+                    width="180">
+            </el-table-column>
+
+            <el-table-column
+                    label="操作"
+                    width="200">
+                <template slot-scope="scope">
+                    <el-button width="100"
+                               size="mini"
+                               @click="handleCheck(scope.$index, scope.row)">批改作业
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-dialog>
+
+  
+
+</div>
+<style>
+</style>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+<script>
+    (function () {
+        $.ajax({
+            type: 'GET',
+            url: "/teacher/check_token",
+//            data: vm.condition,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/teacher_login.html';
+                }
+            },
+            dataType: "json"
+        });
+    })();
+
+    function getAnswerByQuestionId(vm, id) {
+        $.ajax({
+            type: 'GET',
+            url: "/teacher/answer?questionId=" + id,
+//            data: vm.condition,
+//             contentType:"application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.answerList = data.data;
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/teacher_login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function getAnswerById(vm, id) {
+        $.ajax({
+            type: 'GET',
+            url: "/teacher/answer/answerId?answerId=" + id,
+//            data: vm.condition,
+//             contentType:"application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.checkAnswer = data.data;
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/teacher_login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function submitScore(vm) {
+        $.ajax({
+            type: 'POST',
+            url: "/teacher/answer/score",
+            data: {
+                "answerId": vm.checkAnswer.id,
+                "score": vm.checkAnswer.score
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("success!");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/teacher_login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function getSessionList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/session/list",
+//            data: vm.condition,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.sessionList = data.data;
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/teacher_login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+
+    function saveCheckInfo(answerId, url) {
+        $.ajax({
+            type: 'POST',
+            url: "/teacher/answer/save_check",
+            data: {
+                "answerId": answerId,
+                "url": url
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/teacher_login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                sessionList: [],
+                showAnswerList: false,
+                showCheck: false,
+                answerList: [],
+                checkAnswer: {}
+            }
+        },
+        mounted: function () {
+            getSessionList(this);
+        },
+        methods: {
+            onCheckAnswer: function (url) {
+                saveCheckInfo(this.checkAnswer.id, url);
+                window.open("/pages/check_homework.html");
+            },
+            handleEdit: function (idx, row) {
+
+            },
+            handleAnswer: function (idx, row) {
+                getAnswerByQuestionId(this, row.id)
+                this.showAnswerList = true;
+            },
+            handleDelete: function (idx, row) {
+
+            },
+            handleCheck: function (idx, row) {
+                getAnswerById(this, row.id)
+                this.showCheck = true;
+            },
+            onSubmitScore: function () {
+                submitScore(this)
+            },
+            onSubmit: function () {
+
+                this.changePwdV = true;
+            }
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        #login {
+            width: 500px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div id="login">
+        <el-form ref="form" :model="user" label-width="80px">
+            <el-form-item label="Username">
+                <el-input v-model="user.username"></el-input>
+            </el-form-item>
+            <el-form-item label="Password">
+                <el-input type="password" v-model="user.password"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">login</el-button>
+                <el-button type="danger" @click="onRegister">register</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</div>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+<script>
+
+    function login(username, password) {
+        $.ajax({
+            type: 'GET',
+            url: "/user/login",
+            data: {
+                "name": username,
+                "password": password
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code != 0) {
+                    alert("error!");
+                } else {
+                    $(location).attr('href', '/pages/patient_index.html');
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                user: {
+                    'username': "",
+                    'password': ""
+                }
+            }
+        },
+        mounted: function () {
+            //getmediaAccountList(this);
+        },
+        methods: {
+            onSubmit: function () {
+                login(this.user.username, this.user.password)
+            },
+            onRegister: function () {
+                $(location).attr('href', '/pages/register.html');
+            }
+        }
+    })
+</script>
+</html>
