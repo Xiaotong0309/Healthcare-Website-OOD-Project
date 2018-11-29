@@ -2,6 +2,7 @@ package com.test.health.vo;
 
 import java.io.Serializable;
 
+
 public class Result<T> implements Serializable {
 
     private static final long serialVersionUID = -7706430141206682077L;

@@ -9,10 +9,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 
-/**
- * @author zjb
- * @date 2018/11/14.
- */
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserServiceTest {

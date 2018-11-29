@@ -1,5 +1,7 @@
 package com.test.health.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -7,6 +9,7 @@ import java.util.Date;
 
 
 public class User {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private String name;
@@ -19,9 +22,29 @@ public class User {
 
     private String phone;
 
+    private Integer type;
+
     private Date createTime;
 
     private Date updateTime;
+
+    private String title;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
 
     public Long getId() {
         return id;

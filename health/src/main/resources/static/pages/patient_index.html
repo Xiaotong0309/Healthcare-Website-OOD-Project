@@ -2,7 +2,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Patient</title>
-    <!-- 引入样式 -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 </head>
 <body>
@@ -12,7 +11,6 @@
             <el-row>
                 <el-col :span="2">
                     <div style="margin-top:  16px; margin-right:  10px;">
-                      
                     </div>
                 </el-col>
                 <el-col :span="20">
@@ -20,12 +18,13 @@
                              @select="handleSelect">
                         <el-menu-item index="1">Home</el-menu-item>
                         <el-menu-item index="2">Appointment</el-menu-item>
-                      
+                        <el-menu-item index="3">Bill</el-menu-item>
+                        <el-menu-item index="4">Prescription</el-menu-item>
                     </el-menu>
                 </el-col>
                 <el-col :span="2">
                     <div style="margin-top:  16px; margin-right:  10px;">
-                        <el-button type="danger" @click="loginOut">logOut</el-button>
+                        <el-button type="danger" @click="loginOut">logout</el-button>
                     </div>
                 </el-col>
             </el-row>
@@ -61,7 +60,6 @@
         height: 100%;
     }
 
-
 </style>
 </body>
 <!-- import Vue before Element -->
@@ -83,22 +81,28 @@
             loginOut: function () {
                 $.ajax({
                     type: 'GET',
-                    url: "/student/loginOut",
+                    url: "/api/user/logout",
                     contentType: "application/x-www-form-urlencoded",
                     success: function (data) {
-                        top.location.href = '/pages/student_login.html';
+                        top.location.href = '/pages/login.html';
                     },
                     error: function (xhr, textStatus, errorThrown) {
                         if (xhr.status == 401) {
-                            top.location.href = '/pages/student_login.html';
+                            top.location.href = '/pages/login.html';
                         }
                     },
                     dataType: "json"
                 });
             },
             handleSelect: function (idx) {
-                if (idx == "2") {
+                if (idx == "1" ){
+                    $("#detail").attr("src", "home.html");
+                }else if (idx == "2") {
                     $("#detail").attr("src", "appointment.html");
+                }else if (idx == "3") {
+                    $("#detail").attr("src", "bill.html");
+                } else if (idx == "4") {
+                    $("#detail").attr("src", "patient_pre.html");
                 }
             }
         }

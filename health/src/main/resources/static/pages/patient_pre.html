@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>appointment</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <b>Prescription</b>
+    <el-table
+            :data="preList"
+            height="500"
+            fit
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="id"
+                label="Prescription Id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="time"
+                label="time"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="diagnosis"
+                label="diagnosis"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="medicine"
+                label="medicine"
+                width="180">
+        </el-table-column>
+
+
+    </el-table>
+
+</div>
+<style>
+</style>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+<script>
+    (function () {
+        $.ajax({
+            type: 'GET',
+            url: "/api/check_token",
+//            data: vm.condition,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    })();
+
+
+    function getRreList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/pre/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.preList = data.data;
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/teacher_login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function getScheduleAppList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/schedule/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.scheduleAppList = data.data;
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function cancelBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/cancel",
+            data: {
+                "sessionId": sessionId,
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("cancel success");
+                }
+            }
+        });
+    }
+
+    function scheduleBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/schedule",
+            data: {
+                "sessionId": sessionId,
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("schedule success");
+                }
+            }
+        });
+    }
+
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                preList: [],
+                // scheduleAppList:[],
+            }
+        },
+        mounted: function () {
+            getRreList(this);
+            // getScheduleAppList(this);
+        },
+        methods: {
+
+        }
+    })
+</script>
+</html>

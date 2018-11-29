@@ -1,0 +1,10 @@
+com.test.health
+com.test.health.component
+com.test.health.config
+com.test.health.controller
+com.test.health.dao.mapper
+com.test.health.info
+com.test.health.interceptor
+com.test.health.model
+com.test.health.service
+com.test.health.vo

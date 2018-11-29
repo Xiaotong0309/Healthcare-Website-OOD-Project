@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>appointment</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <b>Account Information</b>
+    <p>Login ID {{info.id}}</p>
+    <p>Name: {{info.name}}</p>
+    <p>Address: {{info.address}}</p>
+    <p>Phone Number: {{info.phone}}</p>
+</div>
+<style>
+</style>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+<script>
+    (function () {
+        $.ajax({
+            type: 'GET',
+            url: "/api/check_token",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    })();
+
+
+
+    function getUserInfo(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/user/current",
+//            data: vm.condition,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.info = data.data;
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                info: {},
+            }
+        },
+        mounted: function () {
+            getUserInfo(this);
+        },
+        methods: {
+
+        }
+    })
+</script>
+</html>

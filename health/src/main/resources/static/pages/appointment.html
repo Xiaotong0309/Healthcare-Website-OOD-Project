@@ -7,15 +7,16 @@
 </head>
 <body>
 <div id="app">
+    <b>Search for appointment</b>
     <el-table
             :data="sessionList"
-            height="250"
+            height="500"
             fit
             border
             style="width: 100%">
         <el-table-column
                 prop="id"
-                label="session Id"
+                label="Appointment Id"
                 width="180">
         </el-table-column>
         <el-table-column
@@ -29,60 +30,52 @@
                 width="180">
         </el-table-column>
 
-      
+
         <el-table-column
                 label="operator"
                 width="200">
             <template slot-scope="scope">
                 <el-button width="100"
                            size="mini"
-                           @click="handleEdit(scope.$index, scope.row)">schedule
+                           @click="handleSchedule(scope.$index, scope.row)">schedule
                 </el-button>
-               
             </template>
         </el-table-column>
     </el-table>
 
-    <el-dialog
-            title="detail"
-            :visible.sync="showAnswerList"
-            width="80%">
-     
-        <el-table
-                :data="answerList"
-                height="250"
-                style="width: 80%">
-            <el-table-column
-                    prop="id"
-                    label="id"
-                    width="180">
-            </el-table-column>
-            <el-table-column
-                    prop="studentId"
-                    label="Id"
-                    width="180">
-            </el-table-column>
-            <el-table-column
-                    prop="studentName"
-                    label="name"
-                    width="180">
-            </el-table-column>
-
-            <el-table-column
-                    label="操作"
-                    width="200">
-                <template slot-scope="scope">
-                    <el-button width="100"
-                               size="mini"
-                               @click="handleCheck(scope.$index, scope.row)">批改作业
-                    </el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-    </el-dialog>
-
-  
-
+    <b>My appointment</b>
+    <el-table
+            :data="scheduleAppList"
+            height="500"
+            fit
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="id"
+                label="Appointment Id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="time"
+                label="time"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="doctorName"
+                label="doctor name"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                label="operator"
+                width="200">
+            <template slot-scope="scope">
+                <el-button width="100"
+                           size="mini"
+                           @click="handleCancel(scope.$index, scope.row)">cancel
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
 </div>
 <style>
 </style>
@@ -94,88 +87,25 @@
     (function () {
         $.ajax({
             type: 'GET',
-            url: "/teacher/check_token",
+            url: "/api/check_token",
 //            data: vm.condition,
             contentType: "application/x-www-form-urlencoded",
             success: function (data) {
             },
             error: function (xhr, textStatus, errorThrown) {
                 if (xhr.status == 401) {
-                    top.location.href = '/pages/teacher_login.html';
+                    top.location.href = '/pages/login.html';
                 }
             },
             dataType: "json"
         });
     })();
 
-    function getAnswerByQuestionId(vm, id) {
-        $.ajax({
-            type: 'GET',
-            url: "/teacher/answer?questionId=" + id,
-//            data: vm.condition,
-//             contentType:"application/x-www-form-urlencoded",
-            success: function (data) {
-                if (data.code == 0) {
-                    vm.answerList = data.data;
-                }
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                if (xhr.status == 401) {
-                    top.location.href = '/pages/teacher_login.html';
-                }
-            },
-            dataType: "json"
-        });
-    }
-
-    function getAnswerById(vm, id) {
-        $.ajax({
-            type: 'GET',
-            url: "/teacher/answer/answerId?answerId=" + id,
-//            data: vm.condition,
-//             contentType:"application/x-www-form-urlencoded",
-            success: function (data) {
-                if (data.code == 0) {
-                    vm.checkAnswer = data.data;
-                }
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                if (xhr.status == 401) {
-                    top.location.href = '/pages/teacher_login.html';
-                }
-            },
-            dataType: "json"
-        });
-    }
-
-    function submitScore(vm) {
-        $.ajax({
-            type: 'POST',
-            url: "/teacher/answer/score",
-            data: {
-                "answerId": vm.checkAnswer.id,
-                "score": vm.checkAnswer.score
-            },
-            contentType: "application/x-www-form-urlencoded",
-            success: function (data) {
-                if (data.code == 0) {
-                    alert("success!");
-                }
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                if (xhr.status == 401) {
-                    top.location.href = '/pages/teacher_login.html';
-                }
-            },
-            dataType: "json"
-        });
-    }
 
     function getSessionList(vm) {
         $.ajax({
             type: 'GET',
             url: "/api/session/list",
-//            data: vm.condition,
             contentType: "application/x-www-form-urlencoded",
             success: function (data) {
                 if (data.code == 0) {
@@ -184,63 +114,86 @@
             },
             error: function (xhr, textStatus, errorThrown) {
                 if (xhr.status == 401) {
-                    top.location.href = '/pages/teacher_login.html';
+                    top.location.href = '/pages/login.html';
                 }
             },
             dataType: "json"
         });
     }
 
-
-    function saveCheckInfo(answerId, url) {
+    function getScheduleAppList(vm) {
         $.ajax({
-            type: 'POST',
-            url: "/teacher/answer/save_check",
+            type: 'GET',
+            url: "/api/app/schedule/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.scheduleAppList = data.data;
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function cancelBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/cancel",
             data: {
-                "answerId": answerId,
-                "url": url
+                "sessionId": sessionId,
             },
             contentType: "application/x-www-form-urlencoded",
             success: function (data) {
-
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                if (xhr.status == 401) {
-                    top.location.href = '/pages/teacher_login.html';
+                if (data.code == 0) {
+                    alert("cancel success");
                 }
-            },
-            dataType: "json"
+            }
         });
     }
+
+    function scheduleBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/schedule",
+            data: {
+                "sessionId": sessionId,
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("schedule success");
+                }
+            }
+        });
+    }
+
 
     new Vue({
         el: '#app',
         data: function () {
             return {
                 sessionList: [],
-                showAnswerList: false,
-                showCheck: false,
-                answerList: [],
-                checkAnswer: {}
+                scheduleAppList:[],
             }
         },
         mounted: function () {
             getSessionList(this);
+            getScheduleAppList(this);
         },
         methods: {
             onCheckAnswer: function (url) {
                 saveCheckInfo(this.checkAnswer.id, url);
                 window.open("/pages/check_homework.html");
             },
-            handleEdit: function (idx, row) {
-
+            handleSchedule: function (idx, row) {
+                scheduleBySessionId(row.id)
             },
             handleAnswer: function (idx, row) {
                 getAnswerByQuestionId(this, row.id)
                 this.showAnswerList = true;
             },
-            handleDelete: function (idx, row) {
-
+            handleCancel: function (idx, row) {
+                cancelBySessionId(row.id)
             },
             handleCheck: function (idx, row) {
                 getAnswerById(this, row.id)
@@ -250,7 +203,6 @@
                 submitScore(this)
             },
             onSubmit: function () {
-
                 this.changePwdV = true;
             }
         }

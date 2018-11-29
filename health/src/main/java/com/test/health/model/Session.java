@@ -1,11 +1,14 @@
 package com.test.health.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 
 public class Session {
     private Long id;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+18")
     private Date time;
 
     private Long doctorId;

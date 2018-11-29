@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>appointment</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <b>Search for appointment</b>
+    <el-table
+            :data="sessionList"
+            height="500"
+            fit
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="id"
+                label="Appointment Id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="patientName"
+                label="patient name"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="time"
+                label="time"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="doctorName"
+                label="doctor name"
+                width="180">
+        </el-table-column>
+
+
+
+    </el-table>
+
+</div>
+<style>
+</style>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+<script>
+    (function () {
+        $.ajax({
+            type: 'GET',
+            url: "/api/check_token",
+//            data: vm.condition,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    })();
+
+    function getSessionList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/all/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.sessionList = data.data;
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function getScheduleAppList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/schedule/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.scheduleAppList = data.data;
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function cancelBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/cancel",
+            data: {
+                "sessionId": sessionId,
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("cancel success");
+                }
+            }
+        });
+    }
+
+    function scheduleBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/schedule",
+            data: {
+                "sessionId": sessionId,
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("schedule success");
+                }
+            }
+        });
+    }
+
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                sessionList: [],
+                scheduleAppList:[],
+            }
+        },
+        mounted: function () {
+            getSessionList(this);
+            getScheduleAppList(this);
+        },
+        methods: {
+            onCheckAnswer: function (url) {
+                saveCheckInfo(this.checkAnswer.id, url);
+                window.open("/pages/check_homework.html");
+            },
+            handleSchedule: function (idx, row) {
+                scheduleBySessionId(row.id)
+            },
+            handleAnswer: function (idx, row) {
+                getAnswerByQuestionId(this, row.id)
+                this.showAnswerList = true;
+            },
+            handleCancel: function (idx, row) {
+                cancelBySessionId(row.id)
+            },
+            handleCheck: function (idx, row) {
+                getAnswerById(this, row.id)
+                this.showCheck = true;
+            },
+            onSubmitScore: function () {
+                submitScore(this)
+            },
+            onSubmit: function () {
+                this.changePwdV = true;
+            }
+        }
+    })
+</script>
+</html>

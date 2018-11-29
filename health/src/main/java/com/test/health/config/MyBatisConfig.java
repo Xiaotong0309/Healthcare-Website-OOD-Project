@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Properties;
 
+
 @Configuration
 @MapperScan("com.test.health.dao.mapper")
 public class MyBatisConfig {

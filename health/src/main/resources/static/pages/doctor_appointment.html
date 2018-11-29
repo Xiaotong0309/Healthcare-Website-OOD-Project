@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>appointment</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <b>Incoming Appointment</b>
+    <el-table
+            :data="appList"
+            height="500"
+            fit
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="id"
+                label="Appointment Id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="time"
+                label="time"
+                width="180">
+        </el-table-column>
+
+        <el-table-column
+                label="operator"
+                width="200">
+            <template slot-scope="scope">
+                <el-button width="100"
+                           size="mini"
+                           @click="cancelApp(scope.$index, scope.row)">cancel
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+
+    <b>Add prescription</b>
+    <el-table
+            :data="appList"
+            height="500"
+            fit
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="id"
+                label="Appointment Id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="time"
+                label="time"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="patientId"
+                label="patient id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                label="operator"
+                width="200">
+            <template slot-scope="scope">
+                <el-button width="100"
+                           size="mini"
+                           @click="addPrescription(scope.$index, scope.row)">addPrescription
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    <!--prescription:{-->
+    <!--diagnosis:'',-->
+    <!--medicine:'',-->
+    <!--appointmentId:null,-->
+    <!--}-->
+    <el-dialog
+            title="add prescription"
+            :visible.sync="dialogVisible"
+            width="50%">
+        <p>Appointment Time: {{prescription.time}}</p>
+        <el-form ref="form" :model="prescription" label-width="80px">
+            <el-form-item label="diagnosis">
+                <el-input type="diagnosis" :rows="1" v-model="prescription.diagnosis"></el-input>
+            </el-form-item>
+            <el-form-item label="medicine">
+                <el-input type="medicine" :rows="1" v-model="prescription.medicine"></el-input>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">add</el-button>
+                <el-button @click="dialogVisible = false">cancel</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+</div>
+<style>
+</style>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+<script>
+    (function () {
+        $.ajax({
+            type: 'GET',
+            url: "/api/check_token",
+//            data: vm.condition,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    })();
+
+
+    function getAppList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/doctor/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.appList = data.data;
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function getScheduleAppList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/schedule/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.scheduleAppList = data.data;
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function cancelBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/cancel",
+            data: {
+                "sessionId": sessionId,
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("cancel success");
+                }
+            }
+        });
+    }
+
+    function scheduleBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/schedule",
+            data: {
+                "sessionId": sessionId,
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("schedule success");
+                }
+            }
+        });
+    }
+
+    function addPrescription(vm){
+        // alert(JSON.stringify(vm.prescription));
+        $.ajax({
+            type: 'Post',
+            url: "/api/pre/add",
+            data: JSON.stringify(
+                vm.prescription
+            ),
+            contentType: "application/json",
+            success: function (data) {
+                if (!data.success) {
+                    alert("add prescription error");
+                } else {
+                    vm.dialogVisible = false;
+                    alert("add prescription success");
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                appList: [],
+                scheduleAppList:[],
+                dialogVisible:false,
+                prescription:{
+                    diagnosis:'',
+                    medicine:'',
+                    appointmentId:null,
+                    time:null,
+                }
+            }
+        },
+        mounted: function () {
+            getAppList(this);
+            // getScheduleAppList(this);
+        },
+        methods: {
+            addPrescription: function(idx, row){
+                this.dialogVisible = true;
+                this.prescription.appointmentId = row.id;
+                this.prescription.time = row.time;
+            },
+            handleSchedule: function (idx, row) {
+                scheduleBySessionId(row.id)
+            },
+            handleAnswer: function (idx, row) {
+                getAnswerByQuestionId(this, row.id)
+                this.showAnswerList = true;
+            },
+            cancelApp: function (idx, row) {
+                cancelBySessionId(row.id)
+            },
+            // handleCheck: function (idx, row) {
+            //     getAnswerById(this, row.id)
+            //     this.showCheck = true;
+            // },
+            // onSubmitScore: function () {
+            //     submitScore(this)
+            // },
+            onSubmit: function () {
+                addPrescription(this);
+                // this.dialogVisible = false;
+            }
+        }
+    })
+</script>
+</html>
