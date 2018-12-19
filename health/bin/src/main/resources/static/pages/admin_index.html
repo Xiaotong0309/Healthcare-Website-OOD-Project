@@ -1,0 +1,108 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <el-container style="height: 100%; border: 1px solid #eee">
+        <el-header>
+            <el-row>
+                <el-col :span="2">
+                    <div style="margin-top:  16px; margin-right:  10px;">
+                    </div>
+                </el-col>
+                <el-col :span="20">
+                    <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
+                             @select="handleSelect">
+                        <el-menu-item index="1">Patient</el-menu-item>
+                        <el-menu-item index="2">Appointment</el-menu-item>
+                        <el-menu-item index="3">Doctors</el-menu-item>
+                    </el-menu>
+                </el-col>
+                <el-col :span="2">
+                    <div style="margin-top:  16px; margin-right:  10px;">
+                        <el-button type="danger" @click="loginOut">logout</el-button>
+                    </div>
+                </el-col>
+            </el-row>
+        </el-header>
+        <el-main>
+            <iframe id="detail"
+                    name="detail"
+                    style="margin:0;padding:0;height:100%;width:100%;right:0px;border:solid 0px red;">
+                <!--src="chart.html"-->
+            </iframe>
+        </el-main>
+    </el-container>
+</div>
+<style>
+    .logo-note {
+        height: 47px;
+        width: 50px;
+    }
+
+    #app {
+        height: 100%;
+    }
+
+    body > .el-container {
+        margin-bottom: 40px;
+        height: 100%;
+    }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+</style>
+</body>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+<script>
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {activeIndex: '1-1'}
+        },
+        mounted: function () {
+            // check();
+        },
+        methods: {
+            loginOut: function () {
+                $.ajax({
+                    type: 'GET',
+                    url: "/api/user/logout",
+                    contentType: "application/x-www-form-urlencoded",
+                    success: function (data) {
+                        top.location.href = '/pages/login.html';
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        if (xhr.status == 401) {
+                            top.location.href = '/pages/login.html';
+                        }
+                    },
+                    dataType: "json"
+                });
+            },
+            handleSelect: function (idx) {
+                if (idx == "1" ){
+                    $("#detail").attr("src", "patient_list.html");
+                }else if (idx == "2") {
+                    $("#detail").attr("src", "admin_appointment.html");
+                }else if (idx == "3") {
+                    $("#detail").attr("src", "doctor_list.html");
+                }
+            }
+        }
+    })
+</script>
+</html>

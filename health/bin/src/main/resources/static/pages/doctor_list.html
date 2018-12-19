@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>appointment</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-button width="100"
+                   size="mini"
+                   @click="deleteDoctor()">Add Doctor
+        </el-button>
+    </template>
+    <br/>
+    <br/>
+    <b>DoctorList</b>
+    <el-table
+            :data="doctorList"
+            height="500"
+            fit
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="id"
+                label="Doctor Id"
+                width="80">
+        </el-table-column>
+        <el-table-column
+                prop="name"
+                label="Name"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="address"
+                label="Address"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="phone"
+                label="Phone"
+                width="180">
+        </el-table-column>
+
+        <el-table-column
+                prop="title"
+                label="title"
+                width="180">
+        </el-table-column>
+
+        <el-table-column
+                label="operator"
+                width="200">
+            <template slot-scope="scope">
+
+                <el-button width="100"
+                           size="mini"
+                           @click="deleteDoc(scope.$index, scope.row)">delete
+                </el-button>
+
+            </template>
+        </el-table-column>
+
+    </el-table>
+
+    <el-dialog
+            title="Add Doctor"
+            :visible.sync="dialogVisible"
+            width="50%">
+        <el-form ref="form" :model="doctor" label-width="80px">
+            <el-form-item label="name">
+                <el-input type="name" :rows="1" v-model="doctor.name"></el-input>
+            </el-form-item>
+            <el-form-item label="phone">
+                <el-input type="phone" :rows="1" v-model="doctor.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="title">
+                <el-input type="title" :rows="1" v-model="doctor.title"></el-input>
+            </el-form-item>
+            <el-form-item label="password">
+                <el-input type="password" :rows="1" v-model="doctor.password"></el-input>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">add</el-button>
+                <el-button @click="dialogVisible = false">cancel</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+</div>
+<style>
+</style>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+<script>
+    (function () {
+        $.ajax({
+            type: 'GET',
+            url: "/api/check_token",
+//            data: vm.condition,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    })();
+
+
+    function getDoctorList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/doctor/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.doctorList = data.data;
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function addDoctor(vm) {
+        $.ajax({
+            type: 'POST',
+            url: "/api/doctor/add",
+            data: JSON.stringify(vm.doctor),
+            contentType: "application/json",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert('add doctor success')
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                doctorList: [],
+                dialogVisible: false,
+                doctor:{}
+            }
+        },
+        mounted: function () {
+            getDoctorList(this);
+        },
+        methods: {
+            deleteDoctor: function (index, row) {
+                this.dialogVisible = true;
+            },
+            onSubmit: function () {
+                addDoctor(this);
+                this.dialogVisible = false;
+            }
+        }
+    })
+</script>
+</html>

@@ -29,7 +29,11 @@ public class User {
     private Date updateTime;
 
     private String title;
-
+    
+    public Appointment getAppointment(Long id) {
+    	Appointment ap = new Appointment();
+    	return ap;
+    }
     public String getTitle() {
         return title;
     }

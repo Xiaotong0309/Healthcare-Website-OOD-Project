@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>appointment</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <b>Bill</b>
+    <el-table
+            :data="billList"
+            height="500"
+            fit
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="appointmentId"
+                label="Appointment Id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="time"
+                label="Appointment Time"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="doctorName"
+                label="doctor name"
+                width="180">
+        </el-table-column>
+
+        <el-table-column
+                prop="amount"
+                label="Amount"
+                width="180">
+            {{amount}} $
+        </el-table-column>
+
+        <el-table-column
+                label="operator"
+                width="200">
+            <template slot-scope="scope">
+                    <div v-if="scope.row.status == 1">
+                        paid
+                    </div>
+                    <div v-else>
+                        <el-button width="100"
+                                   size="mini"
+                                   @click="pay(scope.$index, scope.row)">pay
+                        </el-button>
+                    </div>
+
+            </template>
+        </el-table-column>
+    </el-table>
+
+    <el-dialog
+            title="Pay Bill"
+            :visible.sync="dialogVisible"
+            width="50%">
+        <el-form ref="form" :model="bill" label-width="80px">
+            <!--<el-form-item label="diagnosis">-->
+                <!--<el-input type="diagnosis" :rows="1" v-model="prescription.diagnosis"></el-input>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="medicine">-->
+                <!--<el-input type="medicine" :rows="1" v-model="prescription.medicine"></el-input>-->
+            <!--</el-form-item>-->
+            <template>
+                <el-select v-model="value" placeholder="please select">
+                    <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
+            </template>
+
+            <p>total amount you need to pay: {{bill.amount * value}} $</p>
+            <el-form-item>
+                <el-button type="primary" @click="handlePay">pay</el-button>
+                <el-button @click="dialogVisible = false">cancel</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+</div>
+<style>
+</style>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+<script>
+    (function () {
+        $.ajax({
+            type: 'GET',
+            url: "/api/check_token",
+//            data: vm.condition,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    })();
+
+
+    function getBillList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/bill/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.billList = data.data;
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function getScheduleAppList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/schedule/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.scheduleAppList = data.data;
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function cancelBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/cancel",
+            data: {
+                "sessionId": sessionId,
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("cancel success");
+                }
+            }
+        });
+    }
+
+    function payApp(vm) {
+        var price = vm.bill.amount * vm.value;
+        $.ajax({
+            type: 'GET',
+            url: "/api/bill/pay?appId="+vm.bill.appId+"&price="+price,
+            // data: {
+            //     "appId": vm.appId,
+            //     "price": vm.price,
+            // },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("pay app success");
+                    vm.dialogVisible = false;
+                }
+            }
+        });
+    }
+
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                billList: [],
+                scheduleAppList:[],
+                bill:{
+
+                },
+                dialogVisible:false,
+                options: [{
+                    value: '1',
+                    label: 'DianInsurance'
+                }, {
+                    value: '0.75',
+                    label: 'ISOInsurance'
+                }, {
+                    value: '0.5',
+                    label: 'GoldenInsurance'
+                },],
+                value: '1'
+            }
+        },
+        mounted: function () {
+            getBillList(this);
+        },
+        methods: {
+            pay: function (index,row) {
+                this.bill.amount = row.amount;
+                this.bill.price = row.amount * this.value;
+                this.bill.appId = row.appointmentId;
+                this.dialogVisible = true;
+            },
+            handlePay: function () {
+                payApp(this);
+            }
+        }
+    })
+</script>
+</html>

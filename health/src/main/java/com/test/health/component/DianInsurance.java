@@ -1,11 +1,10 @@
 package com.test.health.component;
 
-public class DianInsurance implements Insurance {
+import com.test.health.*;
 
-    public double amount;
+public class DianInsurance extends Insurance{
 
-    @Override
-    public Double calculateDeductAmount() {
-        return amount;
-    }
+	public double calculateFinalAmount(double amount) {
+		return amount*0.5;
+	}
 }

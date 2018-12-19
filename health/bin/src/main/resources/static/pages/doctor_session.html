@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>appointment</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <b>Add session</b></br>
+
+    <template>
+        <div class="block">
+            <!--<span class="demonstration">默认</span>-->
+            <el-date-picker
+                    v-model="valueDate"
+                    type="datetime"
+                    placeholder="Date && Time">
+            </el-date-picker>
+            <el-button width="100"
+                       size="mini"
+                       @click="addSession()">Add
+            </el-button>
+        </div>
+    </template>
+
+    <!--</br>-->
+    <b>Session Management</b>
+    <el-table
+            :data="sessionList"
+            height="800"
+            fit
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="id"
+                label="Session Id"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="time"
+                label="Time"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                label="operator"
+                width="200">
+            <template slot-scope="scope">
+                <el-button width="100"
+                           size="mini"
+                           @click="handleDelete(scope.$index, scope.row)">delete
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+</div>
+<style>
+</style>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+<script>
+    (function () {
+        $.ajax({
+            type: 'GET',
+            url: "/api/check_token",
+//            data: vm.condition,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    })();
+
+    function addSession(time) {
+        ///api/session/add
+        $.ajax({
+            type: 'GET',
+            url: "/api/session/add?time="+time,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("add success")
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function getSessionList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/session/doctor/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.sessionList = data.data;
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    // function getScheduleAppList(vm) {
+    //     $.ajax({
+    //         type: 'GET',
+    //         url: "/api/app/schedule/list",
+    //         contentType: "application/x-www-form-urlencoded",
+    //         success: function (data) {
+    //             if (data.code == 0) {
+    //                 vm.scheduleAppList = data.data;
+    //             }
+    //         },
+    //         dataType: "json"
+    //     });
+    // }
+
+    function deleteBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/session/delete",
+            data: {
+                "sessionId": sessionId,
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("delete success");
+                }
+            }
+        });
+    }
+
+    function cancelBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/cancel",
+            data: {
+                "sessionId": sessionId,
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("cancel success");
+                }
+            }
+        });
+    }
+
+    function scheduleBySessionId(sessionId) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/app/schedule",
+            data: {
+                "sessionId": sessionId,
+            },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert("schedule success");
+                }
+            }
+        });
+    }
+
+//SimpleDateFormat sdf = new SimpleDateFormat("E MMM dd yyyy HH:mm:ss z", Locale.US);
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                sessionList: [],
+                valueDate:''
+                // scheduleAppList:[],
+            }
+        },
+        mounted: function () {
+            getSessionList(this);
+            getScheduleAppList(this);
+        },
+        methods: {
+            handleSchedule: function (idx, row) {
+                scheduleBySessionId(row.id)
+            },
+            handleAnswer: function (idx, row) {
+                getAnswerByQuestionId(this, row.id)
+                this.showAnswerList = true;
+            },
+            addSession: function(){
+                addSession(this.valueDate);
+            },
+            handleDelete: function (idx, row) {
+                deleteBySessionId(row.id)
+            },
+            handleCheck: function (idx, row) {
+                getAnswerById(this, row.id)
+                this.showCheck = true;
+            },
+            onSubmitScore: function () {
+                submitScore(this)
+            },
+            onSubmit: function () {
+                this.changePwdV = true;
+            }
+        }
+    })
+</script>
+</html>

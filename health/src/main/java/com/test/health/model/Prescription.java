@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 
-public class Prescription {
+public class Prescription extends Appointment{
     @TableId(type = IdType.AUTO)
     private Long id;
 

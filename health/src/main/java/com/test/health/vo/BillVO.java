@@ -2,10 +2,12 @@ package com.test.health.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import com.test.health.*;
+import com.test.health.component.Insurance;
+
 import java.util.Date;
 
-
-public class BillVO {
+public class BillVO extends AppointmentVO{
 
     private Long appointmentId;
 
@@ -17,6 +19,8 @@ public class BillVO {
     private String doctorName;
 
     private Integer status;
+    
+    private Insurance insurance;
 
     public Integer getStatus() {
         return status;
@@ -34,13 +38,9 @@ public class BillVO {
         this.appointmentId = appointmentId;
     }
 
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
+    public void setAmount() {
+		amount = this.insurance.calculateFinalAmount(this.insurance.getAmount());
+	}
 
     public Date getTime() {
         return time;

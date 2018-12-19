@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Register</title>
-    <!-- 引入样式 -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <style>
         #login {
@@ -54,7 +53,7 @@
             contentType: "application/json",
             success: function (data) {
                 if (!data.success) {
-                    alert("用户名或者密码错误");
+                    alert("username or password error");
                 } else {
                     $(location).attr('href', '/pages/login.html');
                 }

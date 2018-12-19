@@ -1,12 +1,9 @@
 package com.test.health.component;
 
-
-public class GoldenInsurance implements Insurance {
-
-    public double amount;
-
-    @Override
-    public Double calculateDeductAmount() {
-        return amount*0.5;
-    }
+import com.test.health.*;
+public class GoldenInsurance extends Insurance{
+	public double calculateFinalAmount(double amount) {
+		return 0;
+	}
 }
+

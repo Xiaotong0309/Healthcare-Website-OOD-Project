@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>appointment</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <b>PatientList</b>
+    <el-table
+            :data="patientList"
+            height="500"
+            fit
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="id"
+                label="Patient Id"
+                width="80">
+        </el-table-column>
+        <el-table-column
+                prop="name"
+                label="Name"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="address"
+                label="address"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="phone"
+                label="phone"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="appId"
+                label="Appointment Id"
+                width="80">
+        </el-table-column>
+        <el-table-column
+                prop="time"
+                label="Time"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="doctorName"
+                label="DoctorName"
+                width="180">
+        </el-table-column>
+
+        <el-table-column
+                label="operator"
+                width="200">
+            <template slot-scope="scope">
+                <div v-if="scope.row.appId">
+                    <div v-if="scope.row.status == 2">
+                        paid
+                    </div>
+                    <div v-else>
+                        unpaid
+                        <el-button width="100"
+                                   size="mini"
+                                   @click="addBill(scope.$index, scope.row)">addBill
+                        </el-button>
+                    </div>
+                </div>
+            </template>
+        </el-table-column>
+        <!--<el-table-column-->
+        <!--label="operator"-->
+        <!--width="200">-->
+        <!--<template slot-scope="scope">-->
+        <!--<el-button width="100"-->
+        <!--size="mini"-->
+        <!--@click="handleSchedule(scope.$index, scope.row)">schedule-->
+        <!--</el-button>-->
+        <!--</template>-->
+        <!--</el-table-column>-->
+    </el-table>
+
+    <el-dialog
+            title="Add Bill"
+            :visible.sync="dialogVisible"
+            width="50%">
+        <el-form ref="form" :model="bill" label-width="80px">
+            <el-form-item label="amount">
+                <el-input type="amount" :rows="1" v-model="bill.amount"></el-input>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">add</el-button>
+                <el-button @click="dialogVisible = false">cancel</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+</div>
+<style>
+</style>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+<script>
+    (function () {
+        $.ajax({
+            type: 'GET',
+            url: "/api/check_token",
+//            data: vm.condition,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    })();
+
+
+    function getPatientList(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/patient/list",
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    vm.patientList = data.data;
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    function addBill(vm) {
+        $.ajax({
+            type: 'GET',
+            url: "/api/bill/add?amount="+vm.bill.amount + "&appId="+vm.bill.appId,
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                if (data.code == 0) {
+                    alert('add bill success')
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (xhr.status == 401) {
+                    top.location.href = '/pages/login.html';
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                patientList: [],
+                dialogVisible:false,
+                bill:{},
+                // scheduleAppList:[],
+            }
+        },
+        mounted: function () {
+            getPatientList(this);
+            // getScheduleAppList(this);
+        },
+        methods: {
+            addBill : function (index,row) {
+                this.bill.appId = row.appId;
+                this.dialogVisible = true;
+            },
+            onSubmit : function () {
+                addBill(this);
+                this.dialogVisible = false;
+            }
+        }
+    })
+</script>
+</html>
